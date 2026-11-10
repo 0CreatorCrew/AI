@@ -1,0 +1,91 @@
+수율 분석 AI Agent — 필드 명세,,,,,
+테이블별 필드 설명 · 데이터 타입 · 활용 포인트 (PK=초록 / FK=빨강),,,,,
+,,,,,
+■ yield_monitoring — 수율 측정 원천 테이블,,,,,
+필드명,타입,설명,활용 포인트,KEY,비고
+yield_id (PK),string,수율 측정 레코드 고유 ID,"process_condition, root_cause_analysis의 FK",PK,
+equipment_id,string,장비 코드 (EQP-001~010),전 테이블 크로스 조인 공통 키,,
+process_id,string,공정 코드 (PROC-01~08),공정 단위 수율 추이 분석,,
+product,string,제품 코드 (PRD-A~E),제품별 수율 비교 분석,,
+operator_id,string,담당 작업자,작업자별 수율 패턴 분석,,
+shift,string,주간/야간/새벽,시간대별 수율 편차 분석,,
+target_yield,float %,목표 수율 (%),수율 갭 계산 기준값,,
+actual_yield,float %,실제 수율 (%),핵심 KPI. 시계열 추이 모니터링,,⚠️ 주요
+yield_gap,float,수율 갭 (목표-실제),1이하=정상 / 3이하=주의 / 7이하=저하 / 초과=심각,,⚠️ 주요
+yield_status,string,정상/주의/저하/심각,알림 발송 및 분석 트리거 기준,,⚠️ 주요
+input_qty,int,투입 수량,수율 계산 분모,,
+output_qty,int,양품 수량,수율 계산 분자,,
+defect_qty,int,불량 수량,불량 원인별 분류 분석 기준,,
+loss_qty,int,공정 손실 수량,불량과 구분되는 순수 공정 손실,,
+detection_yn,string,Y / N,Y이면 분석 파이프라인 자동 트리거,,
+consecutive_low_cnt,int,연속 저하 발생 횟수,3회 이상이면 구조적 문제 가능성 → 에스컬레이션,,
+measured_at,datetime,측정 시각,시계열 수율 추이 분석 기준,,
+⚠️  yield_status='심각' OR consecutive_low_cnt >= 3 → 즉시 root_cause_analysis 생성 + 관리자 알림,,,,,
+💡  yield_gap = target_yield - actual_yield. 이 값 기준으로 4단계 등급 자동 분류됩니다.,,,,,
+,,,,,
+■ process_condition — 공정·설비·조건 데이터 테이블,,,,,
+필드명,타입,설명,활용 포인트,KEY,비고
+condition_id (PK),string,조건 레코드 고유 ID,—,PK,
+yield_id (FK),string,연결된 수율 측정 ID,yield_monitoring 조인 기준,FK,
+equipment_id,string,장비 코드,전 테이블 크로스 조인,,
+process_id,string,공정 코드,공정 단위 조건 이탈 분석,,
+temperature_celsius,float,실측 공정 온도 (℃),temp_target과 편차 계산,,
+temp_target,float,목표 온도 (℃),편차 = temperature - temp_target,,
+pressure_kpa,float,실측 압력 (kPa),pressure_target과 편차 계산,,
+pressure_target,float,목표 압력 (kPa),편차 = pressure - pressure_target,,
+speed_rpm,int,실측 공정 속도 (RPM),speed_target과 편차 계산,,
+speed_target,int,목표 속도 (RPM),편차 = speed - speed_target,,
+humidity_pct,float,실측 습도 (%),humidity_target과 편차 계산,,
+humidity_target,float,목표 습도 (%),편차 = humidity - humidity_target,,
+material_grade,string,원자재 등급 (A/B/C),A=고품질 / B=표준 / C=저품질,,
+material_purity_pct,float,원자재 순도 (%),90% 미만이면 수율 저하 원인 후보,,⚠️ 주요
+condition_deviation_score,float 0~100,조건 이탈 점수,온도·압력·속도·습도 편차 종합 점수,,⚠️ 주요
+out_of_spec_yn,string,Y / N,Y이면 즉시 root_cause_analysis 원인 후보 등록,,⚠️ 주요
+recorded_at,datetime,기록 시각,시계열 조건 이탈 패턴 분석,,
+⚠️  out_of_spec_yn='Y' → 해당 조건 항목을 root_cause_analysis의 cause_factor 후보로 자동 등록,,,,,
+💡  condition_deviation_score > 30이면 조건 이탈 수준. 각 편차(온도·압력·속도·습도)를 가중 합산한 값입니다.,,,,,
+,,,,,
+■ root_cause_analysis — 원인 후보 분석 결과 테이블 (Agent 핵심 출력),,,,,
+필드명,타입,설명,활용 포인트,KEY,비고
+rca_id (PK),string,원인 분석 레코드 고유 ID,improvement_tracking의 FK,PK,
+yield_id (FK),string,연결된 수율 측정 ID,yield_monitoring 원인 추적,FK,
+equipment_id,string,장비 코드,장비별 원인 빈도 집계,,
+process_id,string,공정 코드,공정별 원인 빈도 집계,,
+cause_type,string,원인 유형 (6종),유형별 개선 전략 자동 매핑,,
+cause_factor,string,원인 인자 (8종),세부 원인 인자 특정,,
+impact_score,float 0~100,수율 영향도 점수,높을수록 우선 조치. 개선 우선순위 기준,,⚠️ 주요
+confidence_level,float 0~1,원인 신뢰도,0.7 이상이면 확정 원인으로 처리 권고,,⚠️ 주요
+yield_correlation,float -1~1,수율과 상관계수,음수 = 이 인자가 높을수록 수율 저하,,
+cause_rank,int 1~5,원인 우선순위,1=가장 유력한 원인. 점검/개선 순서 기준,,⚠️ 주요
+evidence_data,string,근거 데이터 항목,원인 판단의 근거 필드명 목록,,
+recommended_action,string,권고 조치 내용,improvement_tracking의 improve_title 매핑,,
+estimated_yield_gain,float %,조치 시 예상 수율 회복 (%),개선 ROI 계산 기준,,
+analysis_status,string,분석중/확정/기각,확정만 improvement_tracking으로 연결,,
+analyst_id,string,분석 담당자,책임 추적,,
+analyzed_at,datetime,분석 시각,분석 이력 관리,,
+⚠️  analysis_status='확정' AND confidence_level >= 0.7 → improvement_tracking 자동 생성 권고,,,,,
+💡  cause_rank=1 AND impact_score가 가장 높은 원인이 최우선 개선 대상. estimated_yield_gain으로 개선 효과 사전 예측 가능,,,,,
+,,,,,
+■ improvement_tracking — 개선 항목 추적 관리 테이블,,,,,
+필드명,타입,설명,활용 포인트,KEY,비고
+improve_id (PK),string,개선 레코드 고유 ID,—,PK,
+rca_id (FK),string,연결된 원인 분석 ID,root_cause_analysis 원인 추적,FK,
+yield_id (FK),string,연결된 수율 측정 ID,개선 전후 수율 비교 기준,FK,
+equipment_id,string,장비 코드,장비별 개선 이력 집계,,
+process_id,string,공정 코드,공정별 개선 이력 집계,,
+improve_type,string,개선 유형 (6종),유형별 개선 효과 분석,,
+improve_title,string,개선 항목명,작업자·관리자 화면 표시 항목,,
+priority,int 1~5,우선순위 (1=최우선),개선 착수 순서 결정 기준,,⚠️ 주요
+urgency,string,즉시/금주내/금월내,UI 알림 색상·채널 결정 기준,,⚠️ 주요
+improve_status,string,대기/진행중/완료/보류,개선 진행 상황 추적,,⚠️ 주요
+target_yield_after,float %,개선 후 목표 수율 (%),개선 효과 목표 설정,,
+actual_yield_after,float %,개선 후 실제 수율 (%),NULL=미완료. 완료 시 효과 검증,,
+yield_improvement,float %,실제 수율 개선량 (%),양수=개선 성공 / 음수=효과 없음,,
+assigned_to,string,담당자,책임자 지정 및 알림 발송,,
+start_dt,date,시작일,개선 일정 관리,,
+due_dt,date,완료 예정일,SLA 초과 여부 계산 기준,,
+completed_dt,date,실제 완료일,NULL=미완료. due_dt와 비교,,
+recurrence_yn,string,Y / N,Y이면 동일 원인 재발 → 근본 원인 재분석 필요,,⚠️ 주요
+created_at,datetime,레코드 생성 시각,이력 관리 기준,,
+💡  yield_improvement > 0 AND recurrence_yn='N' → 개선 성공 케이스. 우수 사례로 표준화 권고,,,,,
+⚠️  recurrence_yn='Y' → 동일 원인 재발. root_cause_analysis를 재검토하고 근본 원인 재분석 필요,,,,,
