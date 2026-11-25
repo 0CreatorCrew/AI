@@ -1,0 +1,2 @@
+focus_start,focus_end,period,records,running_records,zero_speed_pct,speed_observed_n,unknown_speed_n,observed_diff_n,bridge_n,speed_mean,speed_std,main_comp_mean,main_comp_std,ejection_mean,ejection_std,waste_increment,waste_share_pct
+60,120,Focus window,360,14,95.40983606557377,305,55,303,2,109.32857142857142,24.10622098359447,0.7214285714285715,1.4126780739642493,173.42857142857142,47.21915238172273,18991.0,35.80370272614155

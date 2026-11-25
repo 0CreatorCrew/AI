@@ -1,0 +1,2 @@
+code,batch,log_rows,unique_ts,repeated_timestamp_rows,duration_min,records_per_timestamp_median,zero_speed_row_pct
+23,790,4938,824,4114,823.0,6.0,41.798298906439854
