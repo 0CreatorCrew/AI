@@ -1,0 +1,3 @@
+code,batch,total_positive_increments,counter_decrease_records,first_90min_waste,first_90min_share_pct,first_running_90min_waste,running_waste,zero_speed_waste
+17,789,43707.0,1,8754.0,20.028828334134122,8754.0,40968.0,2739.0
+15,799,41630.0,1,28939.0,69.51477300024021,29026.0,36510.0,5120.0

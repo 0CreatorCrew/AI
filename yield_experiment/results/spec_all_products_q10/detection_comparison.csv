@@ -1,0 +1,4 @@
+criterion,test_n,below_lsl,above_usl,outside,outside_rate_pct
+q025,232,4,0,4,1.7241379310344827
+q05,232,7,0,7,3.0172413793103448
+q10,232,21,0,21,9.051724137931034

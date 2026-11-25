@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "status": "research_poc_only",
+  "target": "tbl_yield",
+  "unit": "percent",
+  "reference_cutoff": "2020-10-19 02:16:00",
+  "selection_method": {
+    "lsl": "Training lower 2.5 percentile rounded to nearest 0.5 percentage point",
+    "usl": "Training maximum rounded upward to nearest 0.5 percentage point"
+  },
+  "products": {
+    "13": {
+      "lsl": 97.0,
+      "usl": 100.0
+    },
+    "17": {
+      "lsl": 97.0,
+      "usl": 100.0
+    },
+    "23": {
+      "lsl": 96.5,
+      "usl": 100.0
+    }
+  },
+  "disclaimer": "Hypothetical yield limits for research demonstration only. Not approved manufacturing specifications."
+}

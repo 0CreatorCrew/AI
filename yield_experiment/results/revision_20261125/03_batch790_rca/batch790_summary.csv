@@ -1,0 +1,2 @@
+code,batch,phase,start_ts,end_ts,actual,old_lsl,old_q10,prior_n,reference_n,prior_mean,prior_std,prior_q10,lsl,usl,below_lsl,below_exact_q10,lsl_gap,z_score,reference_median,cl,lcl,ucl,mr,mr_ucl,r1_low,r1_high,r2_low,r2_high,r3_low,r3_high,mr_high
+23,790,train,2020-09-11 02:04:00,2020-09-11 15:47:00,93.797,97.5,97.5605,111,102,98.54399999999998,0.7310437121615299,97.684,97.5,100.0,True,True,3.703000000000003,-6.49345575514792,98.722,98.54399999999998,96.88386943907155,100.20413056092842,3.8870000000000005,2.0392911000000007,True,False,False,False,False,False,True

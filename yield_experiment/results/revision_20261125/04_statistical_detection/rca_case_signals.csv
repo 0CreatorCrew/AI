@@ -1,0 +1,4 @@
+code,batch,phase,case_basis,ref_n,tbl_yield,q10,lsl,usl,z_score,cl,lcl,ucl,mr,mr_ucl,r1_low,r1_high,r2_low,r2_high,r3_low,r3_high,mr_high,spec_any,spc_any,spec_status,spc_status
+17,789,test,fixed_cutoff_test,119,87.973,97.60459999999999,97.5,100.0,-14.002649716577695,98.63945378151261,96.7348603808635,100.54404718216173,10.704000000000008,2.3395872966101723,True,False,False,False,False,False,True,True,True,poc_signal,signal
+15,799,test,fixed_cutoff_test,40,95.739,97.1717,97.0,101.0,-3.7772274863365642,98.7137,96.92646595744681,100.5009340425532,3.7439999999999998,2.1954240000000014,True,False,False,False,False,False,True,True,True,poc_signal,signal
+23,790,train,prior_only_retrospective,111,93.797,97.684,97.5,100.0,-6.49345575514792,98.54399999999998,96.88386943907155,100.20413056092842,3.8870000000000005,2.0392911000000007,True,False,False,False,False,False,True,True,True,poc_signal,signal
